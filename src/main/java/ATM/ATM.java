@@ -144,7 +144,9 @@ public class ATM {
         for (int i = 0; i < propertiesArray.length; i++) {
             try {
                 results[i] = Integer.parseInt(propertiesArray[i]);
-            } catch (NumberFormatException nfe) {}
+            } catch (NumberFormatException nfe) {
+                throw new RuntimeException("ОШИБКА: Неверные значения в файле свойств!");
+            }
         }
         return results;
     }
