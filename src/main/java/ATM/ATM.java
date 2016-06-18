@@ -9,18 +9,13 @@ public class ATM {
     private Map<Integer, MoneyCartridge> cartridges;
     private static final int CARTRIDGE_CAPACITY = 20;
     private static final int WITHDRAW_LIMIT = 10;
-    private atmProperties properties;
 
-//    private final int[] denominations = new int[]{
-//            500, 200, 100, 50, 20
-//    };
     private final int[] denominations;
     private final int[] initialQuantity;
 
     public ATM() {
-        properties = new atmProperties();
-        denominations = properties.getDenominations();
-        initialQuantity = properties.getInitialQuantity();
+        denominations = propertiesLoader("denominations", "src/main/resources/app.properties");
+        initialQuantity = propertiesLoader("initialQuantity", "src/main/resources/app.properties");
 
         cartridges = new TreeMap<>(
                 new Comparator<Integer>() {
@@ -94,37 +89,6 @@ public class ATM {
         return true;
     }
 
-//        for (int i = 0; i < denominations.length; i++) {
-//            if (denominationsCounter > WITHDRAW_LIMIT) {
-//                break;
-//            } else {
-//                change[i] = sum / denominations[i];
-//                if(change[i] > WITHDRAW_LIMIT)
-//                    break;
-//                sum -= change[i] * denominations[i];
-//                denominationsCounter += change[i];
-//            }
-//        }
-//
-//        if (sum == 0) {
-//            System.out.println("Сумма в " + initialSum + " грн. будет выдана такими купюрами:");
-//            for (int i = 0; i < denominations.length; i++) {
-//                int counter = change[i];
-//
-//                if (counter > 0)
-//                    System.out.println(counter + " " + denominations[i] + " грн.");
-//            }
-//            System.out.println("Количество купюр: " + denominationsCounter);
-//        } else {
-//            System.out.println("Невозможно выдать запрашиваемую сумму в " + initialSum + " грн.");
-//            int minSum = 0;
-//            for (int i = 0; i < denominations.length; i++) {
-//                minSum += change[i] * denominations[i];
-//            }
-//            System.out.println("К выдаче возможна сумма в " + minSum + " грн.");
-//        }
-//    }
-
     public void withdrawDenomination(int denomination, int quantity) {
         MoneyCartridge cartridge = cartridges.get(denomination);
         for (int j = 0; j < quantity; j++) {
@@ -164,25 +128,24 @@ public class ATM {
         }
     }
 
-    public atmProperties getProperties() {
-        atmProperties properties = new atmProperties();
-        Map<Integer, Integer> denominations = new HashMap<>();
+    public int[] propertiesLoader(String property, String path) {
         FileInputStream fis;
         Properties properties = new Properties();
 
         try {
-            fis = new FileInputStream("src/main/resources/denomination.properties");
+            fis = new FileInputStream(path);
             properties.load(fis);
         } catch (IOException e) {
             System.err.println("ОШИБКА: Файл свойств отсуствует!");
         }
-        Enumeration enumeration = properties.keys();
+        String[] propertiesArray = properties.get(property).toString().split(",");
+        int[] results = new int[propertiesArray.length];
 
-        while (enumeration.hasMoreElements()) {
-            String key = enumeration.nextElement().toString();
-            denominations.put(Integer.valueOf(key), Integer.valueOf(properties.getProperty(key)));
+        for (int i = 0; i < propertiesArray.length; i++) {
+            try {
+                results[i] = Integer.parseInt(propertiesArray[i]);
+            } catch (NumberFormatException nfe) {}
         }
-
-        return denominations;
+        return results;
     }
 }
