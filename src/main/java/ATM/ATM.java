@@ -15,5 +15,5 @@ public interface Atm {
 
     int getAvailableQuantityOfDenomination(int denomination);
 
-    String info();
+    String status();
 }
