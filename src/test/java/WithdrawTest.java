@@ -44,6 +44,28 @@ public class WithdrawTest {
     }
 
     @Test
+    public void testInfo() {
+        // given
+        ATM atm = new ATM();
+        atm.deposit(20, 1);
+        atm.deposit(50, 1);
+        atm.deposit(100, 1);
+        atm.deposit(200, 1);
+        atm.deposit(500, 1);
+
+        // when
+        String result = atm.info();
+
+        // then
+        assertEquals(result,
+                "Картридж [500], ёмкость [20], заполнение [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n" +
+                "Картридж [200], ёмкость [20], заполнение [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n" +
+                "Картридж [100], ёмкость [20], заполнение [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n" +
+                "Картридж [50], ёмкость [20], заполнение [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n" +
+                "Картридж [20], ёмкость [20], заполнение [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]");
+    }
+
+    @Test
     public void testGetAvailableQuantityOfDenomination() {
         // given
         ATM atm = new ATM();
@@ -69,7 +91,7 @@ public class WithdrawTest {
     }
 
     @Test
-    public void testgetAvailableSumOfDenomination() {
+    public void testGetAvailableSumOfDenomination() {
         // given
         ATM atm = new ATM();
         atm.deposit(500, 1);
@@ -108,36 +130,5 @@ public class WithdrawTest {
 
         // then
         assertEquals(3650, actual);
-    }
-
-    @Test
-    public void testWithdrawDenomination() {
-        // given
-        ATM atm = new ATM();
-        atm.deposit(500, 1);
-        atm.deposit(200, 5);
-        atm.deposit(100, 10);
-        atm.deposit(50, 15);
-        atm.deposit(20, 20);
-
-        // when
-        atm.withdrawDenomination(500, 1);
-        atm.withdrawDenomination(200, 2);
-        atm.withdrawDenomination(100, 3);
-        atm.withdrawDenomination(50, 4);
-        atm.withdrawDenomination(20, 5);
-
-        int actual500 = atm.getAvailableQuantityOfDenomination(500);
-        int actual200 = atm.getAvailableQuantityOfDenomination(200);
-        int actual100 = atm.getAvailableQuantityOfDenomination(100);
-        int actual50 = atm.getAvailableQuantityOfDenomination(50);
-        int actual20 = atm.getAvailableQuantityOfDenomination(20);
-
-        // then
-        assertEquals(0, actual500);
-        assertEquals(3, actual200);
-        assertEquals(7, actual100);
-        assertEquals(11, actual50);
-        assertEquals(15, actual20);
     }
 }
