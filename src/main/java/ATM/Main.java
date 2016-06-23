@@ -5,7 +5,7 @@ package ATM;
  */
 public class Main {
     public static void main(String[] args) {
-        ATM atm = new ATM();
+        Atm atm = new AtmImpl();
         atm.deposit(20, 5);
         atm.deposit(50, 5);
         atm.deposit(100, 5);

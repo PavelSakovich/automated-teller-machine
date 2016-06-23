@@ -2,27 +2,31 @@ package ATM;
 
 import java.util.Arrays;
 
-public class MoneyCartridge {
+class MoneyCartridge {
 
     private int maxSize;
     private int[] stackArray;
     private int top;
 
-    public int getPosition() {
+    int getPosition() {
         return top + 1;
     }
 
-    MoneyCartridge(int capacity) {
+    MoneyCartridge(int capacity, int initialQuantity) {
         maxSize = capacity;
         stackArray = new int[maxSize];
         top = -1;
+
+        for (int i = 0; i < initialQuantity; i++) {
+            push(1);
+        }
     }
 
-    public void push(int j) {
+    void push(int j) {
         stackArray[++top] = j;
     }
 
-    public int pop() {
+    int pop() {
         return stackArray[top--];
     }
 
@@ -30,11 +34,11 @@ public class MoneyCartridge {
         return stackArray[top];
     }
 
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return (top == -1);
     }
 
-    public boolean isFull() {
+    boolean isFull() {
         return (top == maxSize - 1);
     }
 
