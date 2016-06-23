@@ -4,15 +4,22 @@ import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class AtmImpl implements Atm {
 
-    private static final Logger log = Logger.getLogger(Atm.class);
     private Map<Integer, MoneyCartridge> cartridges;
     private int withdrawLimit;
     private String propertiesPath;
     private final int[] denominations;
+
+    static{
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        System.setProperty("current.date", dateFormat.format(new Date()));
+    }
+
+    private static final Logger log = Logger.getLogger(Atm.class);
 
     public AtmImpl() {
         propertiesPath = "src/main/resources/atm.properties";
@@ -65,7 +72,6 @@ public class AtmImpl implements Atm {
         int[] change = new int[denominations.length];
         int totalDenominationsCounter = 0;
         int availableSum = getTotalAvailableSum();
-        int changeSum = 0;
 
         if (sum > availableSum) { // сумму вообще нельзя выдать
             System.out.println("Невозможно выдать запрашиваемую сумму " + initialSum + " грн.");
@@ -89,7 +95,6 @@ public class AtmImpl implements Atm {
                     int withdrawalQuantity = sum / denominations[i];
                     change[i] = withdrawalQuantity;
                     totalDenominationsCounter += withdrawalQuantity;
-//                    changeSum += withdrawalQuantity * denominations[i];
                     sum -= withdrawalQuantity * denominations[i];
                 }
             }
