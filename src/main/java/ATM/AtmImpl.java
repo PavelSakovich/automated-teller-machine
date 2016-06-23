@@ -7,7 +7,7 @@ import java.util.*;
 public class AtmImpl implements Atm {
 
     private Map<Integer, MoneyCartridge> cartridges;
-    private static int withdrawLimit;
+    private int withdrawLimit;
     private String propertiesPath;
     private final int[] denominations;
 
@@ -93,17 +93,6 @@ public class AtmImpl implements Atm {
         return true;
     }
 
-    private void withdrawDenomination(int denomination, int quantity) {
-        MoneyCartridge cartridge = cartridges.get(denomination);
-        for (int j = 0; j < quantity; j++) {
-            if (cartridge.isEmpty())
-                break;
-            else {
-                cartridge.pop();
-            }
-        }
-    }
-
     @Override
     public int getTotalAvailableSum() {
         int result = 0;
@@ -138,6 +127,17 @@ public class AtmImpl implements Atm {
         }
 
         return result;
+    }
+
+    private void withdrawDenomination(int denomination, int quantity) {
+        MoneyCartridge cartridge = cartridges.get(denomination);
+        for (int j = 0; j < quantity; j++) {
+            if (cartridge.isEmpty())
+                break;
+            else {
+                cartridge.pop();
+            }
+        }
     }
 
     private int[] propertiesLoader(String property) {
