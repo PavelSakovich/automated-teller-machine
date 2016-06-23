@@ -4,7 +4,7 @@ package ATM;
  * Created by User on 14.06.2016.
  */
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Atm atm = new AtmImpl();
         atm.deposit(20, 5);
         atm.deposit(50, 5);
@@ -16,6 +16,10 @@ public class Main {
         atm.withdraw(4350);
         System.out.println("---------------");
 
-        atm.info();
+        atm.status();
+
+        String currentUsersHomeDir = System.getProperty("user.home");
+        String logFolder = currentUsersHomeDir + "/logs";
+        FolderZiper.zipFolder(logFolder, currentUsersHomeDir + "/logs.zip");
     }
 }

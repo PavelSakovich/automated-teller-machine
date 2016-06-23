@@ -143,7 +143,7 @@ public class AtmImpl implements Atm {
     }
 
     @Override
-    public String info() {
+    public String status() {
         String result = "";
 
         for (Map.Entry<Integer, MoneyCartridge> entry : cartridges.entrySet()) {

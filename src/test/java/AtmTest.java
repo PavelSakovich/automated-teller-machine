@@ -87,7 +87,7 @@ public class AtmTest {
         atm.deposit(500, 1);
 
         // when
-        String result = atm.info();
+        String result = atm.status();
 
         // then
         assertEquals(result,
