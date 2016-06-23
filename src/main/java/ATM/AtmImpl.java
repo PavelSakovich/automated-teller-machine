@@ -1,11 +1,14 @@
 package ATM;
 
+import org.apache.log4j.Logger;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
 public class AtmImpl implements Atm {
 
+    private static final Logger log = Logger.getLogger(Atm.class);
     private Map<Integer, MoneyCartridge> cartridges;
     private int withdrawLimit;
     private String propertiesPath;
@@ -15,8 +18,8 @@ public class AtmImpl implements Atm {
         propertiesPath = "src/main/resources/atm.properties";
         denominations = propertiesLoader("denominations");
         int[] initialQuantity = propertiesLoader("initialQuantity");
-        withdrawLimit = propertiesLoader("withdrawLimit")[0];
         int cartridgeCapacity = propertiesLoader("cartridgeCapacity")[0];
+        withdrawLimit = propertiesLoader("withdrawLimit")[0];
 
         cartridges = new TreeMap<>(
                 new Comparator<Integer>() {
@@ -48,6 +51,10 @@ public class AtmImpl implements Atm {
             }
             System.out.println("Вы успешно добавили " + quantity + " купюр(ы) номиналом "
                     + denomination + " грн. на сумму " + quantity * denomination + " грн.");
+
+            log.info("[DEPOSIT] " + quantity * denomination
+                    + ", банкноты: " + quantity + ", номинал: " + denomination);
+
             return true;
         }
     }
@@ -56,38 +63,50 @@ public class AtmImpl implements Atm {
     public boolean withdraw(int sum) {
         int initialSum = sum;
         int[] change = new int[denominations.length];
-        int denominationsCounter = 0;
+        int totalDenominationsCounter = 0;
         int availableSum = getTotalAvailableSum();
+        int changeSum = 0;
 
-        if (sum > availableSum) { // вообще нельзя выдать
+        if (sum > availableSum) { // сумму вообще нельзя выдать
             System.out.println("Невозможно выдать запрашиваемую сумму " + initialSum + " грн.");
             System.out.println("Доступная к выдаче сумма " + availableSum + " грн.");
+
             return false;
-        } else {                  // можно выдать
+        } else {                  // сумму можно выдать
             for (int i = 0; i < denominations.length; i++) {
 
-                if (getAvailableSumOfDenomination(denominations[i]) > sum) { // можно выдать из текущей кассеты
+                if (getAvailableSumOfDenomination(denominations[i]) >= sum) { // сумму можно выдать из текущей кассеты
                     if (sum >= denominations[i]) {                            // сумма больше номинала
                         int withdrawalQuantity = sum / denominations[i];
-                        denominationsCounter += withdrawalQuantity;
+                        totalDenominationsCounter += withdrawalQuantity;
                         change[i] = withdrawalQuantity;
                         sum = sum - (withdrawalQuantity * denominations[i]);
                         withdrawDenomination(denominations[i], withdrawalQuantity);
                     } else {                                                // сумма меньше номинала
                         // no operation
                     }
-                } else {                                               // нельзя выдать из текущей кассеты
-                    // no operation
+                } else {                                               // сумму нельзя выдать из текущей кассеты
+                    int withdrawalQuantity = sum / denominations[i];
+                    change[i] = withdrawalQuantity;
+                    totalDenominationsCounter += withdrawalQuantity;
+//                    changeSum += withdrawalQuantity * denominations[i];
+                    sum -= withdrawalQuantity * denominations[i];
                 }
             }
-            System.out.println("Сумма " + initialSum + " грн. будет выдана такими купюрами:");
+            System.out.println("Сумма " + initialSum + " грн. будет выдана:");
+            String additionalInfo = "";
+
             for (int i = 0; i < denominations.length; i++) {
                 int counter = change[i];
 
-                if (counter > 0)
-                    System.out.println(counter + " " + denominations[i] + " грн.");
+                if (counter > 0) {
+                    System.out.println("банкноты: " + counter + ", номинал: " + denominations[i] + " грн.");
+                    additionalInfo += " банкноты: " + counter + ", номинал: " + denominations[i] + ";";
+                }
             }
-            System.out.println("Количество купюр: " + denominationsCounter);
+            System.out.println("Количество купюр: " + totalDenominationsCounter);
+
+            log.info("[WITHDRAW] " + initialSum + "," + additionalInfo);
         }
 
         return true;

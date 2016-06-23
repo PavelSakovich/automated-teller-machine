@@ -13,8 +13,7 @@ public class Main {
         atm.deposit(500, 5);
         System.out.println("---------------");
 
-        atm.withdraw(600);
-//        atm.withdraw(4350);
+        atm.withdraw(4350);
         System.out.println("---------------");
 
         atm.info();
