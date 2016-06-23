@@ -1,4 +1,5 @@
-import ATM.ATM;
+import ATM.Atm;
+import ATM.AtmImpl;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertFalse;
@@ -12,7 +13,7 @@ public class DepositTest {
     @Test
     public void testDepositWithDenominationsLessThanCapacity() {
         // given
-        ATM atm = new ATM();
+        Atm atm = new AtmImpl();
 
         // when
         boolean result1 = atm.deposit(20, 20);
@@ -26,7 +27,7 @@ public class DepositTest {
     @Test
     public void testDepositWithDenominationsMoreThanCapacity() {
         // given
-        ATM atm = new ATM();
+        Atm atm = new AtmImpl();
 
         // when
         boolean result1 = atm.deposit(50, 55);
