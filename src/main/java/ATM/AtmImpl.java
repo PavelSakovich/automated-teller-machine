@@ -14,7 +14,7 @@ public class AtmImpl implements Atm {
     private String propertiesPath;
     private final int[] denominations;
 
-    static{
+    static {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         System.setProperty("current.date", dateFormat.format(new Date()));
     }
@@ -24,7 +24,7 @@ public class AtmImpl implements Atm {
     public AtmImpl() {
         propertiesPath = "src/main/resources/atm.properties";
         denominations = propertiesLoader("denominations");
-        int[] initialQuantity = propertiesLoader("initialQuantity");
+        int[] amounts = propertiesLoader("amounts");
         int cartridgeCapacity = propertiesLoader("cartridgeCapacity")[0];
         withdrawLimit = propertiesLoader("withdrawLimit")[0];
 
@@ -39,23 +39,27 @@ public class AtmImpl implements Atm {
 
         for (int i = 0; i < denominations.length; i++) {
             int denomination = denominations[i];
-            cartridges.put(denomination, new MoneyCartridge(cartridgeCapacity, initialQuantity[i]));
+            cartridges.put(denomination, new MoneyCartridge(cartridgeCapacity, amounts[i]));
         }
     }
 
     @Override
     public boolean deposit(int denomination, int quantity) {
+
+        if (!checkInputDenomination(denomination)) {
+            System.out.println("Указан неправильный номинал валюты.");
+            return false;
+        }
+
         MoneyCartridge cartridge = cartridges.get(denomination);
 
-        if (cartridge.isFull() || quantity > cartridge.getMaxSize()) {
+        if (cartridge.isFull() || quantity > cartridge.getCapacity()) {
             System.out.println("Невозможно добавить " + quantity
                     + " купюр(ы) номиналом " + denomination + " грн.");
             return false;
         } else {
-            for (int i = 0; i < quantity; i++) {
-                cartridge.push(1); // "1" if denomination exist
-                cartridges.put(denomination, cartridge);
-            }
+            cartridge.put(quantity);
+//                cartridges.put(denomination, cartridge);
             System.out.println("Вы успешно добавили " + quantity + " купюр(ы) номиналом "
                     + denomination + " грн. на сумму " + quantity * denomination + " грн.");
 
@@ -71,7 +75,7 @@ public class AtmImpl implements Atm {
         int initialSum = sum;
         int[] change = new int[denominations.length];
         int totalDenominationsCounter = 0;
-        int availableSum = getTotalAvailableSum();
+        int availableSum = getTotalSum();
 
         if (sum > availableSum) { // сумму вообще нельзя выдать
             System.out.println("Невозможно выдать запрашиваемую сумму " + initialSum + " грн.");
@@ -87,7 +91,7 @@ public class AtmImpl implements Atm {
                         totalDenominationsCounter += withdrawalQuantity;
                         change[i] = withdrawalQuantity;
                         sum = sum - (withdrawalQuantity * denominations[i]);
-                        withdrawDenomination(denominations[i], withdrawalQuantity);
+//                        withdrawDenomination(denominations[i], withdrawalQuantity);
                     } else {                                                // сумма меньше номинала
                         // no operation
                     }
@@ -96,6 +100,7 @@ public class AtmImpl implements Atm {
                     change[i] = withdrawalQuantity;
                     totalDenominationsCounter += withdrawalQuantity;
                     sum -= withdrawalQuantity * denominations[i];
+//                    withdrawDenomination(denominations[i], withdrawalQuantity);
                 }
             }
             System.out.println("Сумма " + initialSum + " грн. будет выдана:");
@@ -118,28 +123,48 @@ public class AtmImpl implements Atm {
     }
 
     @Override
-    public int getTotalAvailableSum() {
+    public int getTotalSum() {
         int result = 0;
 
         for (int denomination : denominations) {
             MoneyCartridge cartridge = cartridges.get(denomination);
-            int quantity = cartridge.getPosition();
+            int quantity = cartridge.getCurrentQuantity();
             result += quantity * denomination;
         }
         return result;
     }
 
+//    @Override
+//    public int getAvailableSumWithLimit() {
+//        int result = 0;
+//        int counter = 0;
+//
+//        for (int denomination : denominations) {
+//            MoneyCartridge cartridge = cartridges.get(denomination);
+//            int quantity = cartridge.getCurrentQuantity();
+//
+//            if (quantity > withdrawLimit) {
+//                break;
+//            } else {
+//
+//            }
+//            counter += quantity;
+//            result += quantity * denomination;
+//        }
+//        return result;
+//    }
+
     @Override
     public int getAvailableSumOfDenomination(int denomination) {
         MoneyCartridge cartridge = cartridges.get(denomination);
-        int quantity = cartridge.getPosition();
+        int quantity = cartridge.getCurrentQuantity();
         return quantity * denomination;
     }
 
     @Override
     public int getAvailableQuantityOfDenomination(int denomination) {
         MoneyCartridge cartridge = cartridges.get(denomination);
-        return cartridge.getPosition();
+        return cartridge.getCurrentQuantity();
     }
 
     @Override
@@ -153,15 +178,25 @@ public class AtmImpl implements Atm {
         return result;
     }
 
-    private void withdrawDenomination(int denomination, int quantity) {
-        MoneyCartridge cartridge = cartridges.get(denomination);
-        for (int j = 0; j < quantity; j++) {
-            if (cartridge.isEmpty())
-                break;
-            else {
-                cartridge.pop();
+//    private void withdrawDenomination(int denomination, int quantity) {
+//        MoneyCartridge cartridge = cartridges.get(denomination);
+//        for (int j = 0; j < quantity; j++) {
+//            if (cartridge.isEmpty())
+//                break;
+//            else {
+//                cartridge.pop();
+//                System.out.println("[" + denomination + "] " + cartridge.getPosition());
+//            }
+//        }
+//    }
+
+    private boolean checkInputDenomination(int denomination) {
+        for (int i : denominations) {
+            if (i == denomination) {
+                return true;
             }
         }
+        return false;
     }
 
     private int[] propertiesLoader(String property) {

@@ -4,9 +4,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by User on 23.06.2016.
- */
 public class AtmTest {
 
     @Test
@@ -70,14 +67,14 @@ public class AtmTest {
         atm.deposit(20, 20);
 
         // when
-        int actual = atm.getTotalAvailableSum();
+        int actual = atm.getTotalSum();
 
         // then
         assertEquals(3650, actual);
     }
 
     @Test
-    public void testInfo() {
+    public void testInfoWithLowQuantity() {
         // given
         Atm atm = new AtmImpl();
         atm.deposit(20, 1);
@@ -91,10 +88,54 @@ public class AtmTest {
 
         // then
         assertEquals(result,
-                "Картридж [500], ёмкость [20], заполнение [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n" +
-                        "Картридж [200], ёмкость [20], заполнение [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n" +
-                        "Картридж [100], ёмкость [20], заполнение [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n" +
-                        "Картридж [50], ёмкость [20], заполнение [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n" +
-                        "Картридж [20], ёмкость [20], заполнение [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n");
+                        "Картридж [500], ёмкость [20], заполнение [1]\n" +
+                        "Картридж [200], ёмкость [20], заполнение [1]\n" +
+                        "Картридж [100], ёмкость [20], заполнение [1]\n" +
+                        "Картридж [50], ёмкость [20], заполнение [1]\n" +
+                        "Картридж [20], ёмкость [20], заполнение [1]\n");
+    }
+
+    @Test
+    public void testInfoWithMaxQuantity() {
+        // given
+        Atm atm = new AtmImpl();
+        atm.deposit(20, 20);
+        atm.deposit(50, 20);
+        atm.deposit(100, 20);
+        atm.deposit(200, 20);
+        atm.deposit(500, 20);
+
+        // when
+        String result = atm.status();
+
+        // then
+        assertEquals(result,
+                        "Картридж [500], ёмкость [20], заполнение [20]\n" +
+                        "Картридж [200], ёмкость [20], заполнение [20]\n" +
+                        "Картридж [100], ёмкость [20], заполнение [20]\n" +
+                        "Картридж [50], ёмкость [20], заполнение [20]\n" +
+                        "Картридж [20], ёмкость [20], заполнение [20]\n");
+    }
+
+    @Test
+    public void testInfoWithWrongQuantity() {
+        // given
+        Atm atm = new AtmImpl();
+        atm.deposit(20, 22);
+        atm.deposit(50, 33);
+        atm.deposit(100, 44);
+        atm.deposit(200, 55);
+        atm.deposit(500, 66);
+
+        // when
+        String result = atm.status();
+
+        // then
+        assertEquals(result,
+                        "Картридж [500], ёмкость [20], заполнение [0]\n" +
+                        "Картридж [200], ёмкость [20], заполнение [0]\n" +
+                        "Картридж [100], ёмкость [20], заполнение [0]\n" +
+                        "Картридж [50], ёмкость [20], заполнение [0]\n" +
+                        "Картридж [20], ёмкость [20], заполнение [0]\n");
     }
 }

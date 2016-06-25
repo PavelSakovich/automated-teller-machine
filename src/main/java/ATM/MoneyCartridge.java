@@ -1,54 +1,51 @@
 package ATM;
 
-import java.util.Arrays;
-
 class MoneyCartridge {
 
-    private int maxSize;
-    private int[] stackArray;
-    private int top;
-
-    int getPosition() {
-        return top + 1;
-    }
+    private int capacity;
+    private int currentQuantity;
 
     MoneyCartridge(int capacity, int initialQuantity) {
-        maxSize = capacity;
-        stackArray = new int[maxSize];
-        top = -1;
+        this.capacity = capacity;
+        this.currentQuantity = initialQuantity;
+    }
 
-        for (int i = 0; i < initialQuantity; i++) {
-            push(1);
+    boolean get(int quantity) {
+        if (!isEmpty() && quantity <= currentQuantity) {
+            currentQuantity -= quantity;
+            return true;
         }
+        return false;
     }
 
-    void push(int j) {
-        stackArray[++top] = j;
-    }
-
-    int pop() {
-        return stackArray[top--];
-    }
-
-    public int peek() {
-        return stackArray[top];
+    boolean put(int quantity) {
+        if (!isFull() && (quantity + currentQuantity) <= capacity) {
+            currentQuantity += quantity;
+            return true;
+        }
+        return false;
     }
 
     boolean isEmpty() {
-        return (top == -1);
+        return (currentQuantity == 0);
     }
 
     boolean isFull() {
-        return (top == maxSize - 1);
+        return (currentQuantity == capacity);
+    }
+
+    int getCurrentQuantity() {
+        return currentQuantity;
+    }
+
+    int getCapacity() {
+        return capacity;
     }
 
     @Override
     public String toString() {
-        return ", ёмкость [" + maxSize + "]" +
-                ", заполнение " + Arrays.toString(stackArray);
+        return ", ёмкость [" + capacity + "]" +
+                ", заполнение [" + currentQuantity + "]";
     }
 
-    int getMaxSize() {
-        return maxSize;
-    }
 }

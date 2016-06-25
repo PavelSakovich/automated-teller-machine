@@ -6,9 +6,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by User on 15.06.2016.
- */
 public class WithdrawTest {
     @Test
     public void testWithdrawWithSumMoreThanAvailable() {
