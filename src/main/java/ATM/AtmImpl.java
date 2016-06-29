@@ -1,5 +1,8 @@
 package ATM;
 
+import ATM.exception.ExcessFundsException;
+import ATM.exception.InsufficientFundsException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
@@ -9,10 +12,18 @@ import java.util.*;
 
 public class AtmImpl implements Atm {
 
-    private Map<Integer, MoneyCartridge> cartridges;
-    private int withdrawLimit;
-    private String propertiesPath;
+    private final String propertiesPath;
+
+    public int[] getDenominations() {
+        return denominations;
+    }
+
     private final int[] denominations;
+    volatile private int[] amounts;
+    private final int capacity;
+    private final int limit;
+    private final String maxApproximateSum = " Максимально приближенная к запрашиваемой сумма ";
+    private final String currency = " грн.";
 
     static {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -24,181 +35,318 @@ public class AtmImpl implements Atm {
     public AtmImpl() {
         propertiesPath = "src/main/resources/atm.properties";
         denominations = propertiesLoader("denominations");
-        int[] amounts = propertiesLoader("amounts");
-        int cartridgeCapacity = propertiesLoader("cartridgeCapacity")[0];
-        withdrawLimit = propertiesLoader("withdrawLimit")[0];
-
-        cartridges = new TreeMap<>(
-                new Comparator<Integer>() {
-
-                    @Override
-                    public int compare(Integer o1, Integer o2) {
-                        return o2.compareTo(o1);
-                    }
-                });
-
-        for (int i = 0; i < denominations.length; i++) {
-            int denomination = denominations[i];
-            cartridges.put(denomination, new MoneyCartridge(cartridgeCapacity, amounts[i]));
-        }
+        amounts = propertiesLoader("amounts");
+        capacity = propertiesLoader("cartridgeCapacity")[0];
+        limit = propertiesLoader("withdrawLimit")[0];
     }
 
+    /**
+     * Adds specified quantity of denominations to the current ATM's balance.
+     *
+     * @param denomination
+     * @param quantity
+     * @return {@code true} on success;
+     * {@code false} otherwise.
+     * @throws ExcessFundsException on error.
+     */
     @Override
-    public boolean deposit(int denomination, int quantity) {
+    public synchronized String deposit(int denomination, int quantity) throws ExcessFundsException {
 
-        if (!checkInputDenomination(denomination)) {
-            System.out.println("Указан неправильный номинал валюты.");
-            return false;
-        }
+        int position = getArrayPosition(denominations, denomination);
 
-        MoneyCartridge cartridge = cartridges.get(denomination);
+        if (position < 0) {
+            throw new ExcessFundsException("Указан неправильный номинал валюты.");
 
-        if (cartridge.isFull() || quantity > cartridge.getCapacity()) {
-            System.out.println("Невозможно добавить " + quantity
-                    + " купюр(ы) номиналом " + denomination + " грн.");
-            return false;
+        } else if (amounts[position] + quantity > capacity || quantity <= 0) {
+            throw new ExcessFundsException("Невозможно добавить " + quantity
+                    + " купюр(ы) номиналом " + denomination + currency);
+
         } else {
-            cartridge.put(quantity);
-//                cartridges.put(denomination, cartridge);
-            System.out.println("Вы успешно добавили " + quantity + " купюр(ы) номиналом "
-                    + denomination + " грн. на сумму " + quantity * denomination + " грн.");
+            amounts[position] += quantity;
 
-            log.info("[DEPOSIT] " + quantity * denomination
-                    + ", банкноты: " + quantity + ", номинал: " + denomination);
+            log.info("[DEPOSIT] " + quantity * denomination + ", банкноты: "
+                    + quantity + ", номинал: " + denomination + ", баланс: " + balance());
 
-            return true;
+            return "Вы успешно добавили " + quantity + " купюр(ы) номиналом "
+                    + denomination + " грн. на сумму " + quantity * denomination + currency;
         }
     }
 
+    /**
+     * Withdraws specified sum from the current ATM's balance.
+     *
+     * @param sum
+     * @return {@code true} on success;
+     * {@code false} otherwise.
+     * @throws InsufficientFundsException on error.
+     */
     @Override
-    public boolean withdraw(int sum) {
-        int initialSum = sum;
-        int[] change = new int[denominations.length];
-        int totalDenominationsCounter = 0;
-        int availableSum = getTotalSum();
+    public synchronized String withdraw(final int sum) throws InsufficientFundsException {
+        int maxAvailableSum = getMaxAvailableSumWithLimit(limit);
+        String canNotWithdrawSum = "Невозможно выдать запрашиваемую сумму ";
+        String message = canNotWithdrawSum + sum + currency + "\n";
 
-        if (sum > availableSum) { // сумму вообще нельзя выдать
-            System.out.println("Невозможно выдать запрашиваемую сумму " + initialSum + " грн.");
-            System.out.println("Доступная к выдаче сумма " + availableSum + " грн.");
+        if (sum < denominations[denominations.length - 1]) { // sum is less than min denomination
+            message += "\n" + maxApproximateSum + denominations[denominations.length - 1] + currency;
+            throw new InsufficientFundsException(message);
 
-            return false;
-        } else {                  // сумму можно выдать
-            for (int i = 0; i < denominations.length; i++) {
+        } else if (sum > maxAvailableSum) { // sum is more than max available sum
+            message += "Доступная к выдаче сумма " + maxAvailableSum + currency;
+            throw new InsufficientFundsException(message);
 
-                if (getAvailableSumOfDenomination(denominations[i]) >= sum) { // сумму можно выдать из текущей кассеты
-                    if (sum >= denominations[i]) {                            // сумма больше номинала
-                        int withdrawalQuantity = sum / denominations[i];
-                        totalDenominationsCounter += withdrawalQuantity;
-                        change[i] = withdrawalQuantity;
-                        sum = sum - (withdrawalQuantity * denominations[i]);
-//                        withdrawDenomination(denominations[i], withdrawalQuantity);
-                    } else {                                                // сумма меньше номинала
-                        // no operation
-                    }
-                } else {                                               // сумму нельзя выдать из текущей кассеты
-                    int withdrawalQuantity = sum / denominations[i];
-                    change[i] = withdrawalQuantity;
-                    totalDenominationsCounter += withdrawalQuantity;
-                    sum -= withdrawalQuantity * denominations[i];
-//                    withdrawDenomination(denominations[i], withdrawalQuantity);
-                }
+        } else if (!isSumCorrect(sum)) { // sum is not a multiple of 10
+            message += "Сумма должна быть кратна 10" + currency;
+
+            int approximateSum = (sum / 10) * 10;
+            List<Integer[]> possibleChanges = getPossibleChanges(denominations, amounts,
+                    new int[denominations.length], approximateSum, 0);
+
+            if (possibleChanges.isEmpty()) {
+                message += onEmptyChange(approximateSum, possibleChanges);
+                throw new InsufficientFundsException(message);
+
+            } else {
+                int[] minimalChange = ArrayUtils.toPrimitive(getMinimalChange(possibleChanges));
+                message += maxApproximateSum + getChangeSum(denominations, minimalChange) + currency;
+                throw new InsufficientFundsException(message);
             }
-            System.out.println("Сумма " + initialSum + " грн. будет выдана:");
+
+        } else {
+            List<Integer[]> possibleChanges = getPossibleChanges(denominations, amounts,
+                    new int[denominations.length], sum, 0);
+
+            if (possibleChanges.isEmpty()) {
+                message += onEmptyChange(sum, possibleChanges);
+                throw new InsufficientFundsException(message);
+            }
+            int[] minimalChange = ArrayUtils.toPrimitive(getMinimalChange(possibleChanges));
+
+            message = "Сумма " + sum + currency + " будет выдана:" + "<br /><br />";
             String additionalInfo = "";
 
             for (int i = 0; i < denominations.length; i++) {
-                int counter = change[i];
+                int counter = minimalChange[i];
 
                 if (counter > 0) {
-                    System.out.println("банкноты: " + counter + ", номинал: " + denominations[i] + " грн.");
+                    message += "банкноты: " + counter + ", номинал: " + denominations[i]
+                            + currency + "<br />";
                     additionalInfo += " банкноты: " + counter + ", номинал: " + denominations[i] + ";";
                 }
             }
-            System.out.println("Количество купюр: " + totalDenominationsCounter);
-
-            log.info("[WITHDRAW] " + initialSum + "," + additionalInfo);
+            withdrawFromBalance(amounts, minimalChange);
+            log.info("[WITHDRAW] " + sum + ";" + additionalInfo + " баланс: " + balance());
         }
-
-        return true;
+        return message;
     }
 
+    /**
+     * Returns a current ATM's balance.
+     *
+     * @return a current balance.
+     */
     @Override
-    public int getTotalSum() {
+    public int balance() {
         int result = 0;
 
-        for (int denomination : denominations) {
-            MoneyCartridge cartridge = cartridges.get(denomination);
-            int quantity = cartridge.getCurrentQuantity();
-            result += quantity * denomination;
+        for (int i = 0; i < denominations.length; i++) {
+            result += denominations[i] * amounts[i];
         }
         return result;
     }
 
-//    @Override
-//    public int getAvailableSumWithLimit() {
-//        int result = 0;
-//        int counter = 0;
-//
-//        for (int denomination : denominations) {
-//            MoneyCartridge cartridge = cartridges.get(denomination);
-//            int quantity = cartridge.getCurrentQuantity();
-//
-//            if (quantity > withdrawLimit) {
-//                break;
-//            } else {
-//
-//            }
-//            counter += quantity;
-//            result += quantity * denomination;
-//        }
-//        return result;
-//    }
-
-    @Override
-    public int getAvailableSumOfDenomination(int denomination) {
-        MoneyCartridge cartridge = cartridges.get(denomination);
-        int quantity = cartridge.getCurrentQuantity();
-        return quantity * denomination;
-    }
-
-    @Override
-    public int getAvailableQuantityOfDenomination(int denomination) {
-        MoneyCartridge cartridge = cartridges.get(denomination);
-        return cartridge.getCurrentQuantity();
-    }
-
+    /**
+     * Returns a current quantity of denominations.
+     *
+     * @return a current quantity of denominations.
+     */
     @Override
     public String status() {
-        String result = "";
+        StringBuilder sb = new StringBuilder();
 
-        for (Map.Entry<Integer, MoneyCartridge> entry : cartridges.entrySet()) {
-            result += "Картридж [" + entry.getKey() + "]" + entry.getValue().toString() + "\n";
+        for (int i = 0; i < denominations.length; i++) {
+            sb.append("Номинал: ").append(denominations[i]).append(", количество: ")
+                    .append(amounts[i]).append("\n");
         }
+        return String.valueOf(sb);
+    }
 
+    /**
+     * Returns a maximum available sum according to withdraw limit.
+     *
+     * @param limit
+     * @return a maximum available sum according to withdraw limit.
+     * @throws IllegalArgumentException if limit is negative.
+     */
+    private int getMaxAvailableSumWithLimit(int limit) {
+        if (limit < 0) {
+            throw new IllegalArgumentException("Лимит не может быть отрицательным.");
+        }
+        int result = 0;
+
+        for (int i = 0; i < denominations.length; i++) {
+            if (limit == 0) {
+                break;
+            } else if (amounts[i] > limit) {
+                result += denominations[i] * limit;
+                break;
+            } else {
+                result += denominations[i] * amounts[i];
+                limit -= amounts[i];
+            }
+        }
         return result;
     }
 
-//    private void withdrawDenomination(int denomination, int quantity) {
-//        MoneyCartridge cartridge = cartridges.get(denomination);
-//        for (int j = 0; j < quantity; j++) {
-//            if (cartridge.isEmpty())
-//                break;
-//            else {
-//                cartridge.pop();
-//                System.out.println("[" + denomination + "] " + cartridge.getPosition());
-//            }
-//        }
-//    }
+    /**
+     * Returns all possible variants that sum could be withdrawn.
+     *
+     * @param denominations
+     * @param amounts
+     * @param change
+     * @param sum
+     * @param position
+     * @return all possible variants that sum could be withdrawn.
+     */
+    private List<Integer[]> getPossibleChanges(int[] denominations, int[] amounts,
+                                               int[] change, int sum, int position) {
+        List<Integer[]> result = new ArrayList<>();
+        int changeSum = getChangeSum(denominations, change);
 
-    private boolean checkInputDenomination(int denomination) {
-        for (int i : denominations) {
-            if (i == denomination) {
-                return true;
+        if (changeSum < sum) {
+            for (int i = position; i < denominations.length; i++) {
+                if (amounts[i] > change[i]) {
+                    int[] newChange = change.clone();
+                    newChange[i]++;
+                    List<Integer[]> newList = getPossibleChanges(
+                            denominations, amounts, newChange, sum, i);
+
+                    if (newList != null) {
+                        result.addAll(newList);
+                    }
+                }
             }
+
+        } else if (changeSum == sum) {
+            result.add(ArrayUtils.toObject(change));
         }
-        return false;
+        return result;
     }
 
+    /**
+     * Returns a minimal denominations' quantity that sum could be withdrawn.
+     *
+     * @param possibleChanges
+     * @return a minimal denominations' quantity that sum could be withdrawn.
+     */
+    private Integer[] getMinimalChange(List<Integer[]> possibleChanges) {
+        Map<Integer, Integer[]> map = new TreeMap<>();
+
+        for (Integer[] change : possibleChanges) {
+            int sum = 0;
+            for (int i : change)
+                sum += i;
+            map.put(sum, change);
+        }
+        if (map.isEmpty()) {
+            return new Integer[0];
+        } else {
+            return map.entrySet().iterator().next().getValue();
+        }
+    }
+
+    /**
+     * Returns a sum of specified denominations' quantity.
+     *
+     * @param denominations
+     * @param change
+     * @return a sum of specified denominations' quantity.
+     */
+    private int getChangeSum(int[] denominations, int[] change) {
+        int result = 0;
+        for (int i = 0; i < denominations.length; i++) {
+            result += denominations[i] * change[i];
+        }
+        return result;
+    }
+
+    /**
+     * Withdraws denominations from current balance.
+     *
+     * @param amounts
+     * @param change
+     */
+    private void withdrawFromBalance(int[] amounts, int[] change) {
+        for (int i = 0; i < denominations.length; i++) {
+            amounts[i] -= change[i];
+        }
+    }
+
+    /**
+     * Returns position of specified value in array.
+     *
+     * @param array
+     * @param value
+     * @return position of specified value in array if succeed;
+     * {@code -1} otherwise.
+     */
+    private int getArrayPosition(int[] array, int value) {
+        int position = -1;
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == value) {
+                position = i;
+                break;
+            }
+        }
+        return position;
+    }
+
+    /**
+     * Holds a situation when a list of possible changes is empty.
+     *
+     * @param sum
+     * @param possibleChanges
+     * @return a string with next suitable sum.
+     */
+    private String onEmptyChange(int sum, List<Integer[]> possibleChanges) {
+        possibleChanges = tryNextSuitableSum(sum, possibleChanges);
+        int[] minimalChange = ArrayUtils.toPrimitive(getMinimalChange(possibleChanges));
+
+        return maxApproximateSum + getChangeSum(denominations, minimalChange) + currency;
+    }
+
+    /**
+     * Returns a list of possible changes calculated from the next suitable sum.
+     *
+     * @param sum
+     * @param possibleChanges
+     * @return a list of possible changes calculated from the next suitable sum.
+     */
+    private List<Integer[]> tryNextSuitableSum(int sum, List<Integer[]> possibleChanges) {
+        while (possibleChanges.isEmpty() && sum != 0) {
+            sum -= 10;
+            possibleChanges = getPossibleChanges(denominations, amounts,
+                    new int[denominations.length], sum, 0);
+        }
+        return possibleChanges;
+    }
+
+    /**
+     * Checks if input is multiple of 10.
+     *
+     * @param sum
+     * @return {@code true} on success;
+     * {@code false} otherwise.
+     */
+    private boolean isSumCorrect(int sum) {
+        return sum % 10 == 0;
+    }
+
+    /**
+     * Returns an array of properties.
+     *
+     * @param property
+     * @return an array of properties.
+     */
     private int[] propertiesLoader(String property) {
         Properties properties = new Properties();
 

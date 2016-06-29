@@ -1,19 +1,17 @@
 package ATM;
 
-/**
- * Created by User on 23.06.2016.
- */
+import ATM.exception.ExcessFundsException;
+import ATM.exception.InsufficientFundsException;
+
 public interface Atm {
 
-    boolean deposit(int denomination, int quantity);
+    String deposit(int denomination, int quantity) throws InsufficientFundsException, ExcessFundsException;
 
-    boolean withdraw(int sum);
+    String withdraw(int sum) throws InsufficientFundsException;
 
-    int getTotalAvailableSum();
-
-    int getAvailableSumOfDenomination(int denomination);
-
-    int getAvailableQuantityOfDenomination(int denomination);
+    int balance();
 
     String status();
+
+    int[] getDenominations();
 }

@@ -6,9 +6,9 @@ import java.io.FileOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-class FolderZiper {
+public class Archiver {
 
-    static void zipFolder(String srcFolder, String destZipFile) throws Exception {
+    public void zipFolder(String srcFolder, String destZipFile) throws Exception {
         ZipOutputStream zip;
         FileOutputStream fileWriter;
 
@@ -20,7 +20,7 @@ class FolderZiper {
         zip.close();
     }
 
-    private static void addFileToZip(String path, String srcFile, ZipOutputStream zip)
+    private void addFileToZip(String path, String srcFile, ZipOutputStream zip)
             throws Exception {
 
         File folder = new File(srcFile);
@@ -37,7 +37,7 @@ class FolderZiper {
         }
     }
 
-    private static void addFolderToZip(String path, String srcFolder, ZipOutputStream zip)
+    private void addFolderToZip(String path, String srcFolder, ZipOutputStream zip)
             throws Exception {
         File folder = new File(srcFolder);
 

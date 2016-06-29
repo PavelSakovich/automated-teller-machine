@@ -1,25 +1,25 @@
 package ATM;
 
+import ATM.exception.ExcessFundsException;
+import ATM.exception.InsufficientFundsException;
+
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+
         Atm atm = new AtmImpl();
 
-        atm.deposit(20, 5);
-        atm.deposit(50, 5);
-        atm.deposit(100, 5);
-        atm.deposit(200, 5);
-        atm.deposit(500, 5);
-
-        System.out.println(atm.status());
-        System.out.println("---------------");
-
-        atm.withdraw(4350);
-
-        System.out.println("---------------");
-        System.out.println(atm.status());
-
-//        String currentUsersHomeDir = System.getProperty("user.home");
-//        String logFolder = currentUsersHomeDir + "/logs";
-//        FolderZiper.zipFolder(logFolder, currentUsersHomeDir + "/logs.zip");
+        try {
+            atm.deposit(20, 5);
+            atm.deposit(50, 5);
+            atm.deposit(100, 5);
+            atm.deposit(200, 5);
+            atm.deposit(500, 5);
+            System.out.println(atm.balance());
+            atm.withdraw(3500);
+            System.out.println(atm.balance());
+            System.out.println(atm.status());
+        } catch (InsufficientFundsException | ExcessFundsException e) {
+            e.getMessage();
+        }
     }
 }
