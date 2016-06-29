@@ -46,12 +46,6 @@ public class MainServlet extends HttpServlet {
             req.setAttribute("status", atm.status().replaceAll("\n", "<br />"));
             req.getRequestDispatcher("balance.jsp").forward(req, resp);
 
-        } else if (action.startsWith("/logs")) {
-            req.getRequestDispatcher("#").forward(req, resp);
-
-        } else if (action.startsWith("/success")) {
-            req.getRequestDispatcher("success").forward(req, resp);
-
         } else if (action.startsWith("/log")) {
             String currentUsersHomeDir = System.getProperty("user.home");
             String logFolder = currentUsersHomeDir + "/logs";
@@ -89,7 +83,7 @@ public class MainServlet extends HttpServlet {
                 int denomination = Integer.parseInt(selectedValue[0]);
                 int quantity = Integer.parseInt(req.getParameter("quantity"));
                 String result = atm.deposit(denomination, quantity);
-                req.setAttribute("message", result);
+                req.setAttribute("message", result.replaceAll("\n", "<br />"));
                 req.getRequestDispatcher("message.jsp").forward(req, resp);
             } catch (Exception e) {
                 req.setAttribute("message", "ОШИБКА: " + e.getMessage());
@@ -101,7 +95,7 @@ public class MainServlet extends HttpServlet {
             try {
                 int quantity = Integer.parseInt(req.getParameter("quantity"));
                 String result = atm.withdraw(quantity);
-                req.setAttribute("message", result);
+                req.setAttribute("message", result.replaceAll("\n", "<br />"));
                 req.getRequestDispatcher("message.jsp").forward(req, resp);
             } catch (Exception e) {
                 req.setAttribute("message", "ОШИБКА: " + e.getMessage());

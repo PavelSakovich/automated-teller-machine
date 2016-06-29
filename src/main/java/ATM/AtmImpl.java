@@ -121,7 +121,7 @@ public class AtmImpl implements Atm {
             }
             int[] minimalChange = ArrayUtils.toPrimitive(getMinimalChange(possibleChanges));
 
-            message = "Сумма " + sum + currency + " будет выдана:" + "<br /><br />";
+            message = "Сумма " + sum + currency + " будет выдана:" + "\n\n";
             String additionalInfo = "";
 
             for (int i = 0; i < denominations.length; i++) {
@@ -129,7 +129,7 @@ public class AtmImpl implements Atm {
 
                 if (counter > 0) {
                     message += "банкноты: " + counter + ", номинал: " + denominations[i]
-                            + currency + "<br />";
+                            + currency + "\n";
                     additionalInfo += " банкноты: " + counter + ", номинал: " + denominations[i] + ";";
                 }
             }
