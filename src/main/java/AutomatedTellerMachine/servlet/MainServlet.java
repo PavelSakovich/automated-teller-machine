@@ -1,4 +1,4 @@
-package ATM.servlet;
+package AutomatedTellerMachine.servlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,9 +9,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import ATM.Atm;
-import ATM.AtmImpl;
-import ATM.Archiver;
+import AutomatedTellerMachine.Atm;
+import AutomatedTellerMachine.AtmImpl;
+import AutomatedTellerMachine.Archiver;
 
 @WebServlet("/")
 public class MainServlet extends HttpServlet {

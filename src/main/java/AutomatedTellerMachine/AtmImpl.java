@@ -1,7 +1,7 @@
-package ATM;
+package AutomatedTellerMachine;
 
-import ATM.exception.ExcessFundsException;
-import ATM.exception.InsufficientFundsException;
+import AutomatedTellerMachine.exception.ExcessFundsException;
+import AutomatedTellerMachine.exception.InsufficientFundsException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 
@@ -41,7 +41,7 @@ public class AtmImpl implements Atm {
     }
 
     /**
-     * Adds specified quantity of denominations to the current ATM's balance.
+     * Adds specified quantity of denominations to the current AutomatedTellerMachine's balance.
      *
      * @param denomination
      * @param quantity
@@ -73,7 +73,7 @@ public class AtmImpl implements Atm {
     }
 
     /**
-     * Withdraws specified sum from the current ATM's balance.
+     * Withdraws specified sum from the current AutomatedTellerMachine's balance.
      *
      * @param sum
      * @return {@code true} on success;
@@ -140,7 +140,7 @@ public class AtmImpl implements Atm {
     }
 
     /**
-     * Returns a current ATM's balance.
+     * Returns a current AutomatedTellerMachine's balance.
      *
      * @return a current balance.
      */

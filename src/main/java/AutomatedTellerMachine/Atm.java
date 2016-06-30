@@ -1,7 +1,7 @@
-package ATM;
+package AutomatedTellerMachine;
 
-import ATM.exception.ExcessFundsException;
-import ATM.exception.InsufficientFundsException;
+import AutomatedTellerMachine.exception.ExcessFundsException;
+import AutomatedTellerMachine.exception.InsufficientFundsException;
 
 public interface Atm {
 

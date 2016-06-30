@@ -1,4 +1,4 @@
-package ATM;
+package AutomatedTellerMachine;
 
 import java.io.File;
 import java.io.FileInputStream;

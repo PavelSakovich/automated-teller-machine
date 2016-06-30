@@ -1,4 +1,4 @@
-package ATM.exception;
+package AutomatedTellerMachine.exception;
 
 public class InsufficientFundsException extends Exception {
 

@@ -1,7 +1,7 @@
-package ATM;
+package AutomatedTellerMachine;
 
-import ATM.exception.ExcessFundsException;
-import ATM.exception.InsufficientFundsException;
+import AutomatedTellerMachine.exception.ExcessFundsException;
+import AutomatedTellerMachine.exception.InsufficientFundsException;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,7 +15,7 @@ public class Main {
             atm.deposit(200, 5);
             atm.deposit(500, 5);
             System.out.println(atm.balance());
-            atm.withdraw(3500);
+            System.out.println(atm.withdraw(3500));
             System.out.println(atm.balance());
             System.out.println(atm.status());
         } catch (InsufficientFundsException | ExcessFundsException e) {
