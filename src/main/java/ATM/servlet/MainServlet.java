@@ -85,7 +85,7 @@ public class MainServlet extends HttpServlet {
                 int denomination = Integer.parseInt(selectedValue[0]);
                 int quantity;
                 String quantityString = req.getParameter("quantity");
-                if (quantityString.isEmpty()) {
+                if (quantityString.isEmpty() || !isNumeric(quantityString)) {
                     quantity = 0;
                 } else {
                     quantity = Integer.parseInt(quantityString);
@@ -101,7 +101,13 @@ public class MainServlet extends HttpServlet {
 
         if (action.startsWith("/withdraw")) {
             try {
-                int quantity = Integer.parseInt(req.getParameter("quantity"));
+                int quantity;
+                String quantityString = req.getParameter("quantity");
+                if (quantityString.isEmpty() || !isNumeric(quantityString)) {
+                    quantity = 0;
+                } else {
+                    quantity = Integer.parseInt(quantityString);
+                }
                 String result = atm.withdraw(quantity);
                 req.setAttribute("message", result.replaceAll("\n", "<br />"));
                 req.getRequestDispatcher("message.jsp").forward(req, resp);
@@ -115,5 +121,14 @@ public class MainServlet extends HttpServlet {
     private String getAction(HttpServletRequest req) {
         String requestURI = req.getRequestURI();
         return requestURI.substring(req.getContextPath().length(), requestURI.length());
+    }
+
+    public static boolean isNumeric(String str)
+    {
+        for (char c : str.toCharArray())
+        {
+            if (!Character.isDigit(c)) return false;
+        }
+        return true;
     }
 }
