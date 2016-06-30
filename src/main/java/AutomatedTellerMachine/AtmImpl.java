@@ -87,7 +87,7 @@ public class AtmImpl implements Atm {
         String message = canNotWithdrawSum + sum + currency + "\n";
 
         if (sum < denominations[denominations.length - 1]) { // sum is less than min denomination
-            message += "\n" + maxApproximateSum + denominations[denominations.length - 1] + currency;
+            message += "\n" + "Минимальная сумма выдачи " + denominations[denominations.length - 1] + currency;
             throw new InsufficientFundsException(message);
 
         } else if (sum > maxAvailableSum) { // sum is more than max available sum
@@ -96,7 +96,6 @@ public class AtmImpl implements Atm {
 
         } else if (!isSumCorrect(sum)) { // sum is not a multiple of 10
             message += "Сумма должна быть кратна 10" + currency;
-
             int approximateSum = (sum / 10) * 10;
             List<Integer[]> possibleChanges = getPossibleChanges(denominations, amounts,
                     new int[denominations.length], approximateSum, 0);

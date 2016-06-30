@@ -6,11 +6,11 @@
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="style.css" />
 	<link rel="stylesheet" href="buttons.css" />
-    <title>Банкомат</title>
+    <title>Банкомат - Информация</title>
 </head>
 <body>
 
-<h2>Информация</h2>
+<h2>Банкомат → Информация</h2>
 
 <button class="small button" onclick="location.href='/atm'";>Главная</button>
 <button class="small button" onclick="location.href='deposit'";>Положить деньги</button>
