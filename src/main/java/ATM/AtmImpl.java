@@ -128,9 +128,9 @@ public class AtmImpl implements Atm {
                 int counter = minimalChange[i];
 
                 if (counter > 0) {
-                    message += "банкноты: " + counter + ", номинал: " + denominations[i]
+                    message += "купюры: " + counter + ", номинал: " + denominations[i]
                             + currency + "\n";
-                    additionalInfo += " банкноты: " + counter + ", номинал: " + denominations[i] + ";";
+                    additionalInfo += " купюры: " + counter + ", номинал: " + denominations[i] + ";";
                 }
             }
             withdrawFromBalance(amounts, minimalChange);

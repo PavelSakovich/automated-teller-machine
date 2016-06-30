@@ -6,7 +6,7 @@
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="style.css" />
 	<link rel="stylesheet" href="buttons.css" />
-    <title>Банкомат</title>
+    <title>Банкомат - Положить деньги</title>
     <%@include file="checkForm.js" %>
 </head>
 <body>
@@ -20,12 +20,12 @@
 <button class="color red small button" onclick="location.href='log'";>Скачать лог-файлы</button>
 <br /><br />
 
-           <form onsubmit="return checkForm(this)" action="deposit" method="post">
-<div class="center">
-  <p>
+<form onsubmit="return checkForm(this)" action="deposit" method="post">
+    <div class="center">
+        <p>
            <table id="table" border="1" style="margin: 0px auto;">
                 <tr>
-                  <td>Купюры</td>
+                  <td>Номинал</td>
                   <td>
                       <select name="selectedValue" required>
                           <c:forEach items="${denominations}" var="entry">
@@ -40,11 +40,10 @@
                 </tr>
                 <div id='err' class='error'></div>
            </table>
-  </p>
-</div>
-<br />
-<button class="small color green button" type="submit">Положить деньги</button>
-           </form>
-
+        </p>
+    </div>
+    <br />
+    <button class="small color green button" type="submit">Положить деньги</button>
+</form>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <script type="text/javascript">
     function checkForm(form){
         if (document.getElementById('q').value==""){
-            document.getElementById('err').innerHTML='<font color=red>Пожалуйста, укажите количество купюр!</font>';
+            document.getElementById('err').innerHTML='<font color=red>Пожалуйста, укажите количество!</font>';
             return false;
         }
         else {
