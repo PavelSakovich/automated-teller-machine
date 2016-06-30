@@ -18,6 +18,7 @@ public class MainServlet extends HttpServlet {
 
     private Atm atm;
     private Archiver archiver;
+    private final String error = "<b>ОШИБКА:</b> ";
 
     @Override
     public void init() throws ServletException {
@@ -53,7 +54,7 @@ public class MainServlet extends HttpServlet {
             try {
                 archiver.zipFolder(logFolder, currentUsersHomeDir + "/logs.zip");
             } catch (Exception e) {
-                req.setAttribute("message", "ОШИБКА: " + e.getMessage());
+                req.setAttribute("message", error + e.getMessage());
                 req.getRequestDispatcher("message.jsp").forward(req, resp);
             }
 
@@ -78,15 +79,22 @@ public class MainServlet extends HttpServlet {
         String action = getAction(req);
 
         if (action.startsWith("/deposit")) {
+
             try {
                 String[] selectedValue = req.getParameterValues("selectedValue");
                 int denomination = Integer.parseInt(selectedValue[0]);
-                int quantity = Integer.parseInt(req.getParameter("quantity"));
+                int quantity;
+                String quantityString = req.getParameter("quantity");
+                if (quantityString.isEmpty()) {
+                    quantity = 0;
+                } else {
+                    quantity = Integer.parseInt(quantityString);
+                }
                 String result = atm.deposit(denomination, quantity);
                 req.setAttribute("message", result.replaceAll("\n", "<br />"));
                 req.getRequestDispatcher("message.jsp").forward(req, resp);
             } catch (Exception e) {
-                req.setAttribute("message", "ОШИБКА: " + e.getMessage());
+                req.setAttribute("message", error + e.getMessage());
                 req.getRequestDispatcher("message.jsp").forward(req, resp);
             }
         }
@@ -98,7 +106,7 @@ public class MainServlet extends HttpServlet {
                 req.setAttribute("message", result.replaceAll("\n", "<br />"));
                 req.getRequestDispatcher("message.jsp").forward(req, resp);
             } catch (Exception e) {
-                req.setAttribute("message", "ОШИБКА: " + e.getMessage());
+                req.setAttribute("message", error + e.getMessage());
                 req.getRequestDispatcher("message.jsp").forward(req, resp);
             }
         }
