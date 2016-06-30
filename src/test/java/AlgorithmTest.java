@@ -1,5 +1,5 @@
-import ATM.Atm;
-import ATM.AtmImpl;
+import AutomatedTellerMachine.Atm;
+import AutomatedTellerMachine.AtmImpl;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
