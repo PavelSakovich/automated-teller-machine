@@ -101,7 +101,6 @@ public class AtmImpl implements Atm {
 
             if (possibleChanges.isEmpty()) {
                 message += noAvailableChanges(approximateSum, possibleChanges);
-                message += noAvailableChanges(approximateSum, possibleChanges);
             } else {
                 int[] minimalChange = ArrayUtils.toPrimitive(getMinimalChange(possibleChanges));
                 message += maxApproximateSum + getChangeSum(denominations, minimalChange) + currency;
