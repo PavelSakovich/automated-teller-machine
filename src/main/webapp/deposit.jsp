@@ -12,13 +12,7 @@
 <body>
 
 <h2>Банкомат → Положить деньги</h2>
-
-<button class="small button" onclick="location.href='/atm'";>Главная</button>
-<button class="small button" onclick="location.href='deposit'";>Положить деньги</button>
-<button class="small button" onclick="location.href='withdraw'";>Снять деньги</button>
-<button class="small button" onclick="location.href='balance'";>Баланс</button>
-<button class="color red small button" onclick="location.href='log'";>Скачать лог-файлы</button>
-<br /><br />
+<%@include file="navigation.jsp" %>
 
 <form onsubmit="return checkForm(this)" action="deposit" method="post">
     <div class="center">
