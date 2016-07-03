@@ -161,7 +161,10 @@ public class AtmImpl implements Atm {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < denominations.length; i++) {
-            sb.append("Номинал: ").append(denominations[i]).append(", количество: ")
+            sb.append("Номинал: ")
+                    .append(denominations[i])
+                    .append(currency)
+                    .append(", количество: ")
                     .append(amounts[i]).append("\n");
         }
         return String.valueOf(sb);
