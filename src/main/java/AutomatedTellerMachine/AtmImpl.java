@@ -46,7 +46,7 @@ public class AtmImpl implements Atm {
      * @param denomination
      * @param quantity
      * @return a string with result of operation;
-     * @throws ExcessFundsException on error;
+     * @throws ExcessFundsException     on error;
      * @throws IllegalArgumentException if denomination does not exist.
      */
     @Override
@@ -85,19 +85,15 @@ public class AtmImpl implements Atm {
         String canNotWithdrawSum = "Невозможно выдать запрашиваемую сумму ";
         String message = canNotWithdrawSum + sum + currency + "\n";
 
-        if (sum < denominations[denominations.length - 1]) { // sum is less than min denomination
+        if (sum < denominations[denominations.length - 1]) {
             message += "\n" + "Минимальная сумма выдачи " + denominations[denominations.length - 1] + currency;
             throw new InsufficientFundsException(message);
 
-        } else if (sum > maxAvailableSum) { // sum is more than max available sum
-            if (maxAvailableSum == 0) {
-                message += "Отсутствуют номиналы для выдачи.";
-            } else {
-                message += maxApproximateSum + maxAvailableSum + currency;
-            }
+        } else if (maxAvailableSum == 0) {
+            message += "Отсутствуют номиналы для выдачи.";
             throw new InsufficientFundsException(message);
 
-        } else if (!isSumCorrect(sum)) { // sum is not a multiple of 10
+        } else if (!isSumCorrect(sum)) {
             message += "Сумма должна быть кратна 10" + currency;
             int approximateSum = (sum / 10) * 10;
             List<Integer[]> possibleChanges = getPossibleChanges(denominations, amounts,
@@ -105,38 +101,37 @@ public class AtmImpl implements Atm {
 
             if (possibleChanges.isEmpty()) {
                 message += onEmptyChange(approximateSum, possibleChanges);
-                throw new InsufficientFundsException(message);
-
             } else {
                 int[] minimalChange = ArrayUtils.toPrimitive(getMinimalChange(possibleChanges));
                 message += maxApproximateSum + getChangeSum(denominations, minimalChange) + currency;
-                throw new InsufficientFundsException(message);
             }
+            throw new InsufficientFundsException(message);
+
+        } else if (sum > maxAvailableSum) {
+            message += maxApproximateSum + maxAvailableSum + currency;
+            throw new InsufficientFundsException(message);
 
         } else {
             List<Integer[]> possibleChanges = getPossibleChanges(denominations, amounts,
                     new int[denominations.length], sum, 0);
-
             if (possibleChanges.isEmpty()) {
                 message += onEmptyChange(sum, possibleChanges);
                 throw new InsufficientFundsException(message);
             }
             int[] minimalChange = ArrayUtils.toPrimitive(getMinimalChange(possibleChanges));
-
             message = "Сумма " + sum + currency + " будет выдана:" + "\n\n";
-            String additionalInfo = "";
+            String logInfo = "";
 
             for (int i = 0; i < denominations.length; i++) {
                 int counter = minimalChange[i];
-
                 if (counter > 0) {
                     message += "купюры: " + counter + ", номинал: " + denominations[i]
                             + currency + "\n";
-                    additionalInfo += " купюры: " + counter + ", номинал: " + denominations[i] + ";";
+                    logInfo += " купюры: " + counter + ", номинал: " + denominations[i] + ";";
                 }
             }
             withdrawFromBalance(amounts, minimalChange);
-            log.info("[WITHDRAW] " + sum + ";" + additionalInfo + " баланс: " + balance());
+            log.info("[WITHDRAW] " + sum + ";" + logInfo + " баланс: " + balance());
         }
         return message;
     }
