@@ -19,7 +19,7 @@
         <p>
            <table id="table" border="1" style="margin: 0px auto;">
                 <tr>
-                  <td>Номинал</td>
+                  <td>Номинал:</td>
                   <td>
                       <select name="selectedValue" required>
                           <c:forEach items="${denominations}" var="entry">
@@ -29,7 +29,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>Количество</td>
+                  <td>Количество:</td>
                   <td><input id="q" type="text" name="quantity" value=""/></td>
                 </tr>
                 <div id='err' class='error'></div>

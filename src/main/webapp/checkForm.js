@@ -2,7 +2,7 @@
 <script type="text/javascript">
     function checkForm(form){
         if (document.getElementById('q').value==""){
-            document.getElementById('err').innerHTML='<font color=red>Пожалуйста, укажите количество!</font>';
+            document.getElementById('err').innerHTML='<font color=red>Пожалуйста, заполните пустое поле!</font>';
             return false;
         }
         else {

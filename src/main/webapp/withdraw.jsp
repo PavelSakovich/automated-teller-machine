@@ -18,7 +18,7 @@
         <p>
            <table id="table" border="1" style="margin: 0px auto;">
                 <tr>
-                  <td>Количество</td>
+                  <td>Сумма:</td>
                   <td><input id="q" type="text" name="quantity" value=""/></td>
                 </tr>
                 <div id='err' class='error'></div>
