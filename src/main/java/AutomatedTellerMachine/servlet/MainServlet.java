@@ -47,7 +47,7 @@ public class MainServlet extends HttpServlet {
             req.setAttribute("status", atm.status().replaceAll("\n", "<br />"));
             req.getRequestDispatcher("balance.jsp").forward(req, resp);
 
-        } else if (action.startsWith("/log")) {
+        } else if (action.startsWith("/logs.zip")) {
             String currentUsersHomeDir = System.getProperty("user.home");
             String logFolder = currentUsersHomeDir + "/logs";
 
