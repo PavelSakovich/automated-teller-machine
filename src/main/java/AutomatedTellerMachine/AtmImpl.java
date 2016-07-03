@@ -36,8 +36,8 @@ public class AtmImpl implements Atm {
         propertiesPath = "src/main/resources/atm.properties";
         denominations = propertiesLoader("denominations");
         amounts = propertiesLoader("amounts");
-        capacity = propertiesLoader("cartridgeCapacity")[0];
-        limit = propertiesLoader("withdrawLimit")[0];
+        capacity = propertiesLoader("capacity")[0];
+        limit = propertiesLoader("limit")[0];
     }
 
     /**
