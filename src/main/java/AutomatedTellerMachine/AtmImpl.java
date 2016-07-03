@@ -41,13 +41,13 @@ public class AtmImpl implements Atm {
     }
 
     /**
-     * Adds specified quantity of denominations to the current AutomatedTellerMachine's balance.
+     * Adds specified quantity of denominations to the current ATM's balance.
      *
      * @param denomination
      * @param quantity
-     * @return {@code true} on success;
-     * {@code false} otherwise.
-     * @throws ExcessFundsException on error.
+     * @return a string with result of operation;
+     * @throws ExcessFundsException on error;
+     * @throws IllegalArgumentException if denomination does not exist.
      */
     @Override
     public synchronized String deposit(int denomination, int quantity) throws ExcessFundsException {
@@ -55,7 +55,7 @@ public class AtmImpl implements Atm {
         int position = getArrayPosition(denominations, denomination);
 
         if (position < 0) {
-            throw new ExcessFundsException("Указан неправильный номинал валюты.");
+            throw new IllegalArgumentException("Указан неправильный номинал валюты.");
 
         } else if (amounts[position] + quantity > capacity || quantity <= 0) {
             throw new ExcessFundsException("Невозможно добавить " + quantity
@@ -73,11 +73,10 @@ public class AtmImpl implements Atm {
     }
 
     /**
-     * Withdraws specified sum from the current AutomatedTellerMachine's balance.
+     * Withdraws specified sum from the current ATM's balance.
      *
      * @param sum
-     * @return {@code true} on success;
-     * {@code false} otherwise.
+     * @return a string with result of operation;
      * @throws InsufficientFundsException on error.
      */
     @Override
@@ -212,7 +211,7 @@ public class AtmImpl implements Atm {
      */
     private List<Integer[]> getPossibleChanges(int[] denominations, int[] amounts,
                                                int[] change, int sum, int position) {
-        List<Integer[]> result = new ArrayList<>();
+        List<Integer[]> possibleChanges = new ArrayList<>();
         int changeSum = getChangeSum(denominations, change);
 
         if (changeSum < sum) {
@@ -220,19 +219,19 @@ public class AtmImpl implements Atm {
                 if (amounts[i] > change[i]) {
                     int[] newChange = change.clone();
                     newChange[i]++;
-                    List<Integer[]> newList = getPossibleChanges(
+                    List<Integer[]> subChanges = getPossibleChanges(
                             denominations, amounts, newChange, sum, i);
 
-                    if (newList != null) {
-                        result.addAll(newList);
+                    if (subChanges != null) {
+                        possibleChanges.addAll(subChanges);
                     }
                 }
             }
 
         } else if (changeSum == sum) {
-            result.add(ArrayUtils.toObject(change));
+            possibleChanges.add(ArrayUtils.toObject(change));
         }
-        return result;
+        return possibleChanges;
     }
 
     /**
