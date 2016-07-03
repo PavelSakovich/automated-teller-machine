@@ -100,7 +100,8 @@ public class AtmImpl implements Atm {
                     new int[denominations.length], approximateSum, 0);
 
             if (possibleChanges.isEmpty()) {
-                message += onEmptyChange(approximateSum, possibleChanges);
+                message += noAvailableChanges(approximateSum, possibleChanges);
+                message += noAvailableChanges(approximateSum, possibleChanges);
             } else {
                 int[] minimalChange = ArrayUtils.toPrimitive(getMinimalChange(possibleChanges));
                 message += maxApproximateSum + getChangeSum(denominations, minimalChange) + currency;
@@ -115,7 +116,7 @@ public class AtmImpl implements Atm {
             List<Integer[]> possibleChanges = getPossibleChanges(denominations, amounts,
                     new int[denominations.length], sum, 0);
             if (possibleChanges.isEmpty()) {
-                message += onEmptyChange(sum, possibleChanges);
+                message += noAvailableChanges(sum, possibleChanges);
                 throw new InsufficientFundsException(message);
             }
             int[] minimalChange = ArrayUtils.toPrimitive(getMinimalChange(possibleChanges));
@@ -304,7 +305,7 @@ public class AtmImpl implements Atm {
      * @param possibleChanges
      * @return a string with next suitable sum.
      */
-    private String onEmptyChange(int sum, List<Integer[]> possibleChanges) {
+    private String noAvailableChanges(int sum, List<Integer[]> possibleChanges) {
         possibleChanges = tryNextSuitableSum(sum, possibleChanges);
         int[] minimalChange = ArrayUtils.toPrimitive(getMinimalChange(possibleChanges));
 
