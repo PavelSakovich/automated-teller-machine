@@ -91,7 +91,7 @@ public class AtmImpl implements Atm {
             throw new InsufficientFundsException(message);
 
         } else if (sum > maxAvailableSum) { // sum is more than max available sum
-            message += "Доступная к выдаче сумма " + maxAvailableSum + currency;
+            message += maxApproximateSum + maxAvailableSum + currency;
             throw new InsufficientFundsException(message);
 
         } else if (!isSumCorrect(sum)) { // sum is not a multiple of 10
