@@ -200,6 +200,10 @@ public class AtmImpl implements Atm {
     /**
      * Returns all possible variants that sum could be withdrawn.
      *
+     * Making amount from given set of coins is n-p complete problem because it
+     * reduces to subset sum problem or knapsack problem. See more at
+     * https://stackoverflow.com/questions/22128759/atm-algorithm-of-giving-money-with-limited-amount-of-bank-notes
+     *
      * @param denominations
      * @param amounts
      * @param change
