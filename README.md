@@ -1,8 +1,8 @@
 ## ATM Web Application
 
-Stores a certain amount of money in banknotes of 20, 50, 100, 200, 500;
-ATM can not store more than 20 bills of the same value at the same time;
-Stores values and quantities in the Properties file.
+Stores a certain amount of money in banknotes of 20, 50, 100, 200, 500;\
+ATM can not store more than 20 bills of the same value at the same time;\
+Stores values and quantities in the Properties file.\
 *Uses Servlets, Jetty, Log4j, JUnit, Maven.*
 
 ### Develop an algorithm for money withdraw
@@ -24,5 +24,6 @@ Stores values and quantities in the Properties file.
 - The file name must contain the current date;
 - Logging should consist of time, type of transaction and additional information (banknote / denomination);
 - The system should allow you to download all the logs in one zip archive.
+
 
 ![Demonstration](https://raw.githubusercontent.com/ksergey12/automated-teller-machine/master/Atm.gif)
