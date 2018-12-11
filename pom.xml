@@ -5,7 +5,6 @@
 	<properties>
 		<module.name>AutomatedTellerMachine</module.name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>8.1.3.v20120416</jetty.version>
     </properties>
 
 	<groupId>ATM</groupId>
@@ -33,30 +32,6 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 		</dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-client</artifactId>
-            <version>${jetty.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${jetty.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-            <version>${jetty.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-jsp</artifactId>
-            <version>${jetty.version}</version>
-            <scope>provided</scope>
-        </dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -81,15 +56,12 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
                 <configuration>
-                    <webApp>
-                        <contextPath>/atm</contextPath>
-                    </webApp>
-                    <stopPort>9999</stopPort>
-                    <stopKey>foo</stopKey>
+                    <port>8080</port>
+                    <path>/atm</path>
                 </configuration>
             </plugin>
         </plugins>
