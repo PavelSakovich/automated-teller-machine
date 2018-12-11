@@ -25,4 +25,4 @@ Stores values and quantities in the Properties file.
 - Logging should consist of time, type of transaction and additional information (banknote / denomination);
 - The system should allow you to download all the logs in one zip archive.
 
-![Demonstration](https://github.com/ksergey12/automated-teller-machine/blob/master/atm.gif)
+![Demonstration](https://raw.githubusercontent.com/ksergey12/automated-teller-machine/master/Atm.gif)
