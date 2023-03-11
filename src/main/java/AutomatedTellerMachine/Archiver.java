@@ -42,7 +42,7 @@ public class Archiver {
         File folder = new File(srcFolder);
 
         for (String fileName : folder.list()) {
-            if (path.equals("")) {
+            if (path.equals("  ")) {
                 addFileToZip(folder.getName(), srcFolder + "/" + fileName, zip);
             } else {
                 addFileToZip(path + "/" + folder.getName(), srcFolder + "/" + fileName, zip);
